@@ -13,8 +13,7 @@
         #screen_container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
         canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated; }
     </style>
-    <!-- Independent jsDelivr Library URL instead of copy.sh -->
-    <script src="https://cdn.jsdelivr.net/npm/v86@latest/build/libv86.js"></script>
+    <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
@@ -23,39 +22,28 @@
     </div>
 
     <script>
-        // Your uncompressed Filebin disk link
-        const FILEBIN_URL = "https://filebin.net"; 
-
         window.onload = function() {
-            // Automatically measures the image size from Filebin over the network
-            fetch(FILEBIN_URL, { method: "HEAD" }).then(response => {
-                const totalBytes = parseInt(response.headers.get("content-length"), 10);
-                
-                if (!totalBytes || isNaN(totalBytes)) {
-                    console.error("Could not fetch file size automatically.");
-                    alert("Could not load file size. Please ensure the Filebin upload finished completely.");
-                    return;
-                }
+            // Direct Link to your uploaded image
+            const FILEBIN_URL = "https://filebin.net"; 
+            
+            // Hardcoded precise byte size to skip Filebin's network filter blocks
+            const EXACT_FILE_SIZE = 536870912; 
 
-                var emulator = new V86({
-                    // Clean asset sources via jsDelivr and static community git mirrors
-                    wasm_path: "https://jsdelivr.net",
-                    bios: { url: "https://jsdelivr.net" },
-                    vga_bios: { url: "https://jsdelivr.net" },
-                    
-                    screen_container: document.getElementById("screen_container"),
-                    memory_size: 64 * 1024 * 1024,
-                    vga_memory_size: 8 * 1024 * 1024,
-                    boot_order: 0x312, 
-                    autostart: true,
-                    hda: {
-                        url: FILEBIN_URL, 
-                        size: totalBytes, 
-                        async: true 
-                    }
-                });
-            }).catch(err => {
-                alert("Error connecting to file server.");
+            var emulator = new V86({
+                wasm_path: "https://jsdelivr.net",
+                bios: { url: "https://jsdelivr.net" },
+                vga_bios: { url: "https://jsdelivr.net" },
+                
+                screen_container: document.getElementById("screen_container"),
+                memory_size: 64 * 1024 * 1024,
+                vga_memory_size: 8 * 1024 * 1024,
+                boot_order: 0x312, 
+                autostart: true,
+                hda: {
+                    url: FILEBIN_URL, 
+                    size: EXACT_FILE_SIZE, 
+                    async: true 
+                }
             });
         };
     </script>
